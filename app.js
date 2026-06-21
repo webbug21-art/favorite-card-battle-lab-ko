@@ -22,10 +22,10 @@
     {name:"Speed Race",stat:"speed",bonus:"Speed"},{name:"Dark Hallway",stat:"power",bonus:"Shadow"},{name:"Puzzle Room",stat:"brain",bonus:"Brain"},{name:"Secret File Test",stat:"brain",bonus:"Mystery"},{name:"Chase Round",stat:"speed",bonus:"Monster"},{name:"Detective Round",stat:"brain",bonus:"Detective"},{name:"Build Defense",stat:"shield",bonus:"Builder"},{name:"Glitch Zone",stat:"brain",bonus:"Glitch"},{name:"Funny Meme Battle",stat:"speed",bonus:"Funny"},{name:"Boss Door",stat:"power",bonus:"Monster"},{name:"Quiet Room",stat:"brain",bonus:"Mystery"},{name:"Bright Light Room",stat:"shield",bonus:"Tech"}
   ];
   const ART = {
-    "Seek":"assets/seek.png","Shy Guy":"assets/shy-guy.png","Prism Fox":"assets/prism-fox.png","Gear Golem":"assets/gear-golem.png","Lantern Owl":"assets/lantern-owl.png",
-    "Figure":"assets/doors-figure.png","Rush":"assets/doors-rush.png","Screech":"assets/doors-screech.png",
-    "SCP-173":"assets/scp-173.png","SCP-096":"assets/shy-guy.png","SCP-999":"assets/scp-999.png","SCP-049":"assets/scp-049.png",
-    "Tralalero Tralala":"assets/brainrot-tralalero.png","Ballerina Cappuccina":"assets/brainrot-ballerina.png","Tung Tung Tung Sahur":"assets/brainrot-tung-tung.png"
+    "Seek":"assets/seek-v2.png","Shy Guy":"assets/scp-096-v2.png","Prism Fox":"assets/prism-fox.png","Gear Golem":"assets/gear-golem.png","Lantern Owl":"assets/lantern-owl.png",
+    "Figure":"assets/doors-figure.png","Rush":"assets/doors-rush-v2.png","Screech":"assets/doors-screech.png",
+    "SCP-173":"assets/scp-173-v2.png","SCP-096":"assets/scp-096-v2.png","SCP-999":"assets/scp-999.png","SCP-049":"assets/scp-049.png",
+    "Tralalero Tralala":"assets/brainrot-tralalero-v2.png","Ballerina Cappuccina":"assets/brainrot-ballerina.png","Tung Tung Tung Sahur":"assets/brainrot-tung-tung-v2.png"
   };
   const FAN_DETAILS = {
     "Seek":["Hallway Rush","Eye Trail","Bright Puzzle Room","You cannot hide forever."],
@@ -76,16 +76,16 @@
   const CARD_DB = PACKS.flatMap((p, pi) => p.names.map((n,i) => normalCard(p,n,i,pi)));
   const BOSSES = [
     {id:"boss-seek",name:"Seek",source:"Roblox DOORS Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Shadow",type2:"Speed",power:8,speed:10,brain:6,shield:6,specialSkill1:"Hallway Rush",specialSkill2:"Eye Trail",weakness:"Bright Puzzle Room",catchphrase:"You cannot hide forever.",description:"DOORS의 Seek를 8세 어린이용으로 재해석한 비공식 팬 카드. 눈 모양 빛을 따라 미지의 복도를 달리는 그림자 챔피언입니다.",icon:"👁️",image:ART.Seek,level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Shadow Runner"},
-    {id:"boss-shy",name:"Shy Guy",source:"SCP Foundation Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Mystery",type2:"Monster",power:10,speed:7,brain:5,shield:8,specialSkill1:"Don't Look",specialSkill2:"Panic Chase",weakness:"Calm Room",catchphrase:"Do not stare.",description:"SCP-096의 별명에서 출발해 퍼즐 가면 수호자로 순화한 비공식 팬 카드. 차분한 방에서는 움직임이 느려져요.",icon:"◻️",image:ART["Shy Guy"],level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Quiet Guardian"}
+    {id:"boss-shy",name:"Shy Guy",source:"SCP Foundation Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Mystery",type2:"Monster",power:10,speed:7,brain:5,shield:8,specialSkill1:"Don't Look",specialSkill2:"Panic Chase",weakness:"Calm Room",catchphrase:"Do not stare.",description:"SCP-096의 아주 길고 마른 모습과 얼굴을 가린 자세를 알아볼 수 있게 살린 비공식 팬 카드. 어린이가 볼 수 있도록 공격 장면 없이 순화했어요.",icon:"◻️",image:ART["Shy Guy"],level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Quiet Guardian"}
   ];
-  const defaultState = () => ({version:2,collection:BOSSES.map(c=>({...c})),stories:[],settings:{limitOn:false,dailyLimit:3},opened:{date:today(),count:0},buildRewards:{}});
+  const defaultState = () => ({version:3,collection:BOSSES.map(c=>({...c})),stories:[],settings:{limitOn:false,dailyLimit:3},opened:{date:today(),count:0},buildRewards:{}});
   let state;
   const savedText = localStorage.getItem(KEY);
   try { state = {...defaultState(), ...JSON.parse(savedText || "null")}; } catch { state = defaultState(); }
   if (!Array.isArray(state.collection)) state = defaultState();
-  if ((state.version||1)<2) {
+  if ((state.version||1)<3) {
     BOSSES.forEach(fresh=>{ const old=state.collection.find(c=>c.id===fresh.id); if(old){ const progress={level:old.level,xp:old.xp,isFavorite:old.isFavorite,power:old.power,speed:old.speed,brain:old.brain,shield:old.shield,evolutionStage:old.evolutionStage}; Object.assign(old,fresh,progress); } });
-    state.version=2;
+    state.version=3;
     localStorage.setItem(KEY, JSON.stringify(state));
   }
   // 최초 실행 데이터도 전용 공간에만 기록합니다. 다른 앱의 저장 키는 읽거나 수정하지 않습니다.

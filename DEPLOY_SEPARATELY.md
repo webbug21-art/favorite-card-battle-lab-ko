@@ -89,7 +89,7 @@ assets/ 폴더 전체
 ```
 
 3. 업로드가 끝날 때까지 기다립니다. 이미지가 14장이라 잠시 걸릴 수 있습니다.
-4. 업로드 목록에서 `index.html`, `app.js`, `style.css`, `assets/seek.png` 등이 보이는지 확인합니다.
+4. 업로드 목록에서 `index.html`, `app.js`, `style.css`, `assets/seek-v2.png` 등이 보이는지 확인합니다.
 5. 화면 아래쪽까지 스크롤합니다.
 6. Commit message에 `Initial Korean Card Battle Lab`을 입력합니다.
 7. **Commit directly to the main branch**가 선택되어 있으면 그대로 둡니다.
