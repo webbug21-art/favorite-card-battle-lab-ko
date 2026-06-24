@@ -91,6 +91,18 @@
     state.version=7;
     localStorage.setItem(KEY, JSON.stringify(state));
   }
+  function syncOfficialCards(){
+    const catalog=new Map([...CARD_DB,...BOSSES].map(c=>[c.id,c]));
+    let changed=false;
+    state.collection=state.collection.map(card=>{
+      if(card.isHandmade||!catalog.has(card.id)) return card;
+      const synced=officialWithProgress(catalog.get(card.id),card);
+      if(card.image!==synced.image||card.rarity!==synced.rarity||card.type1!==synced.type1||card.type2!==synced.type2||card.specialSkill1!==synced.specialSkill1||card.specialSkill2!==synced.specialSkill2||card.power!==synced.power||card.speed!==synced.speed||card.brain!==synced.brain||card.shield!==synced.shield||card.evolutionStage!==synced.evolutionStage) changed=true;
+      return synced;
+    });
+    if(changed) localStorage.setItem(KEY, JSON.stringify(state));
+  }
+  syncOfficialCards();
   // 최초 실행 데이터도 전용 공간에만 기록합니다. 다른 앱의 저장 키는 읽거나 수정하지 않습니다.
   if (!localStorage.getItem(KEY)) localStorage.setItem(KEY, JSON.stringify(state));
   let currentScreen = "home", currentCardId = null, imageData = "", buildMode = "roblox", editingBack = "collection";
