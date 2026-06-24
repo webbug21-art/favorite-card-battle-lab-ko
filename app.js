@@ -6,7 +6,7 @@
   const PACKS = [
     {id:"doors",name:"DOORS Original Character Pack",icon:"👁️",color:"#7b4cff",blurb:"DOORS 대표 엔티티 10종 · 전 카드 일러스트",source:"Roblox DOORS",fan:true,names:["Seek","Figure","Rush","Screech","Eyes","Halt","Ambush","Timothy","Jack","Guiding Light"],types:["Shadow","Monster"]},
     {id:"scp",name:"SCP Character Files Pack",icon:"◉",color:"#d7b267",blurb:"대표 SCP 10종 · 어린이용 비유혈 팬아트",source:"SCP Foundation",fan:true,names:["SCP-173","SCP-096","SCP-999","SCP-049","SCP-131","SCP-682","SCP-3008-2","SCP-2295","SCP-529","SCP-1762"],types:["Mystery","Monster"]},
-    {id:"brainrot",name:"Brainrot Original Legends Pack",icon:"🌀",color:"#ff5e93",blurb:"유명 브레인랏 캐릭터 10종 · 전 카드 일러스트",source:"Internet Brainrot",fan:true,names:["Tralalero Tralala","Bombardiro Crocodilo","Ballerina Cappuccina","Tung Tung Tung Sahur","Cappuccino Assassino","Lirili Larila","Chimpanzini Bananini","Bombombini Gusini","Brr Brr Patapim","La Vaca Saturno Saturnita"],types:["Funny","Glitch"]}
+    {id:"brainrot",name:"Brainrot Original Legends Pack",icon:"🌀",color:"#ff5e93",blurb:"유명 브레인랏 캐릭터 11종 · Brainrot 67 글리치 카드 추가",source:"Internet Brainrot",fan:true,names:["Tralalero Tralala","Bombardiro Crocodilo","Ballerina Cappuccina","Tung Tung Tung Sahur","Cappuccino Assassino","Lirili Larila","Chimpanzini Bananini","Bombombini Gusini","Brr Brr Patapim","La Vaca Saturno Saturnita","Brainrot 67"],types:["Funny","Glitch"]}
   ];
   const RULES = [
     {name:"Speed Race",stat:"speed",bonus:"Speed"},{name:"Dark Hallway",stat:"power",bonus:"Shadow"},{name:"Puzzle Room",stat:"brain",bonus:"Brain"},{name:"Secret File Test",stat:"brain",bonus:"Mystery"},{name:"Chase Round",stat:"speed",bonus:"Monster"},{name:"Detective Round",stat:"brain",bonus:"Detective"},{name:"Build Defense",stat:"shield",bonus:"Builder"},{name:"Glitch Zone",stat:"brain",bonus:"Glitch"},{name:"Funny Meme Battle",stat:"speed",bonus:"Funny"},{name:"Boss Door",stat:"power",bonus:"Monster"},{name:"Quiet Room",stat:"brain",bonus:"Mystery"},{name:"Bright Light Room",stat:"shield",bonus:"Tech"}
@@ -15,7 +15,7 @@
     "Seek":"assets/seek-v2.webp","Shy Guy":"assets/scp-096-v2.webp","Figure":"assets/doors-figure.webp","Rush":"assets/doors-rush-v2.webp","Screech":"assets/doors-screech.webp",
     "Eyes":"assets/doors-eyes.webp","Halt":"assets/doors-halt.webp","Ambush":"assets/doors-ambush.webp","Timothy":"assets/doors-timothy.webp","Jack":"assets/doors-jack.webp","Guiding Light":"assets/doors-guiding-light.webp",
     "SCP-173":"assets/scp-173-v2.webp","SCP-096":"assets/scp-096-v2.webp","SCP-999":"assets/scp-999.webp","SCP-049":"assets/scp-049.webp","SCP-131":"assets/scp-131.webp","SCP-682":"assets/scp-682.webp","SCP-3008-2":"assets/scp-3008-2.webp","SCP-2295":"assets/scp-2295.webp","SCP-529":"assets/scp-529.webp","SCP-1762":"assets/scp-1762.webp",
-    "Tralalero Tralala":"assets/brainrot-tralalero-v2.webp","Bombardiro Crocodilo":"assets/brainrot-bombardiro.webp","Ballerina Cappuccina":"assets/brainrot-ballerina.webp","Tung Tung Tung Sahur":"assets/brainrot-tung-tung-v2.webp","Cappuccino Assassino":"assets/brainrot-cappuccino.webp","Lirili Larila":"assets/brainrot-lirili.webp","Chimpanzini Bananini":"assets/brainrot-chimpanzini.webp","Bombombini Gusini":"assets/brainrot-bombombini.webp","Brr Brr Patapim":"assets/brainrot-patapim.webp","La Vaca Saturno Saturnita":"assets/brainrot-vaca-saturno.webp"
+    "Tralalero Tralala":"assets/brainrot-tralalero-v2.webp","Bombardiro Crocodilo":"assets/brainrot-bombardiro.webp","Ballerina Cappuccina":"assets/brainrot-ballerina.webp","Tung Tung Tung Sahur":"assets/brainrot-tung-tung-v2.webp","Cappuccino Assassino":"assets/brainrot-cappuccino.webp","Lirili Larila":"assets/brainrot-lirili.webp","Chimpanzini Bananini":"assets/brainrot-chimpanzini.webp","Bombombini Gusini":"assets/brainrot-bombombini.webp","Brr Brr Patapim":"assets/brainrot-patapim.webp","La Vaca Saturno Saturnita":"assets/brainrot-vaca-saturno.webp","Brainrot 67":"assets/brainrot-67.png"
   };
   const FAN_DETAILS = {
     "Seek":["Hallway Rush","Eye Trail","Bright Puzzle Room","You cannot hide forever."],
@@ -47,7 +47,8 @@
     "Chimpanzini Bananini":["Banana Boogie","Jungle Joke","Empty Peel","Banana power!"],
     "Bombombini Gusini":["Goose Jet","Feather Formation","Strong Headwind","Gusini takes flight!"],
     "Brr Brr Patapim":["Forest Stomp","Patapim Echo","Smooth Floor","Brr brr—here I come!"],
-    "La Vaca Saturno Saturnita":["Saturn Ring","Cosmic Moo","Tiny Door","Moo to the moon!" ]
+    "La Vaca Saturno Saturnita":["Saturn Ring","Cosmic Moo","Tiny Door","Moo to the moon!" ],
+    "Brainrot 67":["Sixty-Seven Glitch","Meme Number Combo","No-WiFi Zone","Six-seven! Critical meme hit!"]
   };
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
@@ -61,23 +62,33 @@
     const primary = pack.types[index % 2], secondary = TYPES[(globalIndex * 3 + index) % TYPES.length];
     const rarity = rarityCycle[index], bump = ["Rare","Epic","Mythic"].includes(rarity) ? 2 : 0;
     const fan = FAN_DETAILS[name];
-    return {id:`${pack.id}-${index}`,name,source:pack.source,pack:pack.name,rarity,type1:primary,type2:secondary===primary?"Brain":secondary,power:4+(globalIndex+index)%4+bump,speed:3+(globalIndex*2+index)%5,brain:3+(globalIndex+index*2)%5,shield:3+(globalIndex*3+index)%5,specialSkill1:fan?.[0],specialSkill2:fan?.[1],weakness:fan?.[2],catchphrase:fan?.[3],description:`${pack.source}의 ${name} 핵심 외형을 알아볼 수 있게 새로 제작한 비공식 팬 카드입니다. 8세 어린이가 볼 수 있도록 비유혈 장면으로 표현했으며 공식 상품이 아닙니다.`,icon:pack.icon,image:ART[name],level:1,xp:0,isFavoriteBoss:false,isHandmade:false,isFavorite:false,isFanCard:true,evolutionStage:"Base"};
+    const card = {id:`${pack.id}-${index}`,name,source:pack.source,pack:pack.name,rarity,type1:primary,type2:secondary===primary?"Brain":secondary,power:4+(globalIndex+index)%4+bump,speed:3+(globalIndex*2+index)%5,brain:3+(globalIndex+index*2)%5,shield:3+(globalIndex*3+index)%5,specialSkill1:fan?.[0],specialSkill2:fan?.[1],weakness:fan?.[2],catchphrase:fan?.[3],description:`${pack.source}의 ${name} 핵심 외형을 알아볼 수 있게 새로 제작한 비공식 팬 카드입니다. 8세 어린이가 볼 수 있도록 비유혈 장면으로 표현했으며 공식 상품이 아닙니다.`,icon:pack.icon,image:ART[name],level:1,xp:0,isFavoriteBoss:false,isHandmade:false,isFavorite:false,isFanCard:true,evolutionStage:"Base"};
+    if (name === "Seek") Object.assign(card,{rarity:"Epic",power:7,speed:9,brain:6,shield:6,specialSkill1:"Super Hallway Rush",specialSkill2:"Eye Trail Boost",evolutionStage:"Shadow Sprinter"});
+    if (name === "Figure") Object.assign(card,{rarity:"Epic",power:9,speed:5,brain:7,shield:8,specialSkill1:"Echo Power Hunt",specialSkill2:"Library Lockdown",evolutionStage:"Echo Guardian"});
+    if (name === "Brainrot 67") Object.assign(card,{rarity:"Mythic",type1:"Glitch",type2:"Funny",power:7,speed:8,brain:9,shield:5,evolutionStage:"Meme Glitch"});
+    return card;
   }
   const CARD_DB = PACKS.flatMap((p, pi) => p.names.map((n,i) => normalCard(p,n,i,pi)));
   const BOSSES = [
-    {id:"boss-seek",name:"Seek",source:"Roblox DOORS Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Shadow",type2:"Speed",power:8,speed:10,brain:6,shield:6,specialSkill1:"Hallway Rush",specialSkill2:"Eye Trail",weakness:"Bright Puzzle Room",catchphrase:"You cannot hide forever.",description:"DOORS의 Seek를 8세 어린이용으로 재해석한 비공식 팬 카드. 눈 모양 빛을 따라 미지의 복도를 달리는 그림자 챔피언입니다.",icon:"👁️",image:ART.Seek,level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Shadow Runner"},
+    {id:"boss-seek",name:"Seek",source:"Roblox DOORS Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Shadow",type2:"Speed",power:9,speed:11,brain:7,shield:7,specialSkill1:"Ultimate Hallway Rush",specialSkill2:"Eye Storm Trail",weakness:"Bright Puzzle Room",catchphrase:"You cannot hide forever.",description:"DOORS의 Seek를 8세 어린이용으로 재해석한 비공식 팬 카드. 눈 모양 빛을 따라 미지의 복도를 달리는 그림자 챔피언입니다. 이번 버전에서는 추격 속도와 그림자 파워가 조금 더 강해졌어요.",icon:"👁️",image:ART.Seek,level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Shadow Runner"},
     {id:"boss-shy",name:"Shy Guy",source:"SCP Foundation Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Mystery",type2:"Monster",power:10,speed:7,brain:5,shield:8,specialSkill1:"Don't Look",specialSkill2:"Panic Chase",weakness:"Calm Room",catchphrase:"Do not stare.",description:"SCP-096의 아주 길고 마른 모습과 얼굴을 가린 자세를 알아볼 수 있게 살린 비공식 팬 카드. 어린이가 볼 수 있도록 공격 장면 없이 순화했어요.",icon:"◻️",image:ART["Shy Guy"],level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Quiet Guardian"}
   ];
-  const defaultState = () => ({version:5,collection:BOSSES.map(c=>({...c})),stories:[],settings:{limitOn:false,dailyLimit:3},opened:{date:today(),count:0},buildRewards:{}});
+  const defaultState = () => ({version:6,collection:BOSSES.map(c=>({...c})),stories:[],settings:{limitOn:false,dailyLimit:3},opened:{date:today(),count:0},buildRewards:{}});
   let state;
   const savedText = localStorage.getItem(KEY);
   try { state = {...defaultState(), ...JSON.parse(savedText || "null")}; } catch { state = defaultState(); }
   if (!Array.isArray(state.collection)) state = defaultState();
-  if ((state.version||1)<5) {
+  function officialWithProgress(fresh, old){
+    const level = Math.max(1, old.level || 1), next = {...fresh, level, xp:old.xp||0, isFavorite:!!old.isFavorite};
+    for(let l=2;l<=level;l++){ const stat=["power","speed","brain","shield"][(l-2)%4]; next[stat]++; }
+    next.evolutionStage=evolution(next);
+    return next;
+  }
+  if ((state.version||1)<6) {
     const freshCards=[...CARD_DB,...BOSSES], allowed=new Set(freshCards.map(c=>c.id));
     state.collection=state.collection.filter(c=>c.isHandmade||allowed.has(c.id));
-    freshCards.forEach(fresh=>{ const old=state.collection.find(c=>c.id===fresh.id); if(old){ const progress={level:old.level,xp:old.xp,isFavorite:old.isFavorite,power:old.power,speed:old.speed,brain:old.brain,shield:old.shield,evolutionStage:old.evolutionStage}; Object.assign(old,fresh,progress); } });
-    state.version=5;
+    freshCards.forEach(fresh=>{ const old=state.collection.find(c=>c.id===fresh.id); if(old) Object.assign(old, officialWithProgress(fresh, old)); });
+    state.version=6;
     localStorage.setItem(KEY, JSON.stringify(state));
   }
   // 최초 실행 데이터도 전용 공간에만 기록합니다. 다른 앱의 저장 키는 읽거나 수정하지 않습니다.
@@ -196,10 +207,10 @@
       const catalog=new Map([...CARD_DB,...BOSSES].map(c=>[c.id,c]));
       d.collection=d.collection.filter(c=>c.isHandmade||catalog.has(c.id)).map(c=>{
         c.image=safeImage(c.image); if(c.isHandmade)return c;
-        const fresh=catalog.get(c.id), progress={level:c.level,xp:c.xp,isFavorite:c.isFavorite,power:c.power,speed:c.speed,brain:c.brain,shield:c.shield,evolutionStage:c.evolutionStage};
-        return {...fresh,...progress};
+        const fresh=catalog.get(c.id);
+        return officialWithProgress(fresh,c);
       });
-      state={...defaultState(),...d,version:5}; save(); renderAll(); toast("백업을 불러왔어요"); go("home");
+      state={...defaultState(),...d,version:6}; save(); renderAll(); toast("백업을 불러왔어요"); go("home");
     }catch{toast("올바른 백업 파일이 아니에요");}};
     r.readAsText(file);
   }
