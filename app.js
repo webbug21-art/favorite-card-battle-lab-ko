@@ -73,7 +73,7 @@
     {id:"boss-seek",name:"Seek",source:"Roblox DOORS Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Shadow",type2:"Speed",power:9,speed:11,brain:7,shield:7,specialSkill1:"Ultimate Hallway Rush",specialSkill2:"Eye Storm Trail",weakness:"Bright Puzzle Room",catchphrase:"You cannot hide forever.",description:"DOORS의 Seek를 8세 어린이용으로 재해석한 비공식 팬 카드. 눈 모양 빛을 따라 미지의 복도를 달리는 그림자 챔피언입니다. 이번 버전에서는 추격 속도와 그림자 파워가 조금 더 강해졌어요.",icon:"👁️",image:ART.Seek,level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Shadow Runner"},
     {id:"boss-shy",name:"Shy Guy",source:"SCP Foundation Fan",pack:"Favorite Boss Vault",rarity:"Favorite Boss",type1:"Mystery",type2:"Monster",power:10,speed:7,brain:5,shield:8,specialSkill1:"Don't Look",specialSkill2:"Panic Chase",weakness:"Calm Room",catchphrase:"Do not stare.",description:"SCP-096의 아주 길고 마른 모습과 얼굴을 가린 자세를 알아볼 수 있게 살린 비공식 팬 카드. 어린이가 볼 수 있도록 공격 장면 없이 순화했어요.",icon:"◻️",image:ART["Shy Guy"],level:1,xp:0,isFavoriteBoss:true,isHandmade:false,isFavorite:true,isFanCard:true,evolutionStage:"Quiet Guardian"}
   ];
-  const defaultState = () => ({version:6,collection:BOSSES.map(c=>({...c})),stories:[],settings:{limitOn:false,dailyLimit:3},opened:{date:today(),count:0},buildRewards:{}});
+  const defaultState = () => ({version:7,collection:BOSSES.map(c=>({...c})),stories:[],settings:{limitOn:false,dailyLimit:3},opened:{date:today(),count:0},buildRewards:{}});
   let state;
   const savedText = localStorage.getItem(KEY);
   try { state = {...defaultState(), ...JSON.parse(savedText || "null")}; } catch { state = defaultState(); }
@@ -84,11 +84,11 @@
     next.evolutionStage=evolution(next);
     return next;
   }
-  if ((state.version||1)<6) {
+  if ((state.version||1)<7) {
     const freshCards=[...CARD_DB,...BOSSES], allowed=new Set(freshCards.map(c=>c.id));
     state.collection=state.collection.filter(c=>c.isHandmade||allowed.has(c.id));
     freshCards.forEach(fresh=>{ const old=state.collection.find(c=>c.id===fresh.id); if(old) Object.assign(old, officialWithProgress(fresh, old)); });
-    state.version=6;
+    state.version=7;
     localStorage.setItem(KEY, JSON.stringify(state));
   }
   // 최초 실행 데이터도 전용 공간에만 기록합니다. 다른 앱의 저장 키는 읽거나 수정하지 않습니다.
@@ -135,7 +135,10 @@
   function openPack(id){
     if(state.opened.date!==today()) state.opened={date:today(),count:0};
     if(state.settings.limitOn && state.opened.count>=state.settings.dailyLimit){toast("오늘의 발견을 모두 마쳤어요 🌙");return;}
-    const pool=CARD_DB.filter(c=>c.id.startsWith(id+"-")), draw=[...pool].sort(()=>Math.random()-.5).slice(0,3);
+    const pool=CARD_DB.filter(c=>c.id.startsWith(id+"-"));
+    const guaranteed=id==="brainrot"?pool.find(c=>c.name==="Brainrot 67"):null;
+    let draw=[...pool].sort(()=>Math.random()-.5).slice(0,3);
+    if(guaranteed&&!state.collection.some(c=>c.id===guaranteed.id)&&!draw.some(c=>c.id===guaranteed.id)) draw=[guaranteed,...draw.filter(c=>c.id!==guaranteed.id)].slice(0,3);
     draw.forEach(c=>{ const old=state.collection.find(x=>x.id===c.id); if(old) gainXP(old,4,false); else state.collection.push({...c}); });
     state.opened.count++;save();
     const area=$("#revealArea"); area.innerHTML=`<span class="eyebrow">NEW DISCOVERIES</span><h2>새 친구를 찾았어요!</h2><div class="reveal-cards">${draw.map(c=>cardHTML(c)).join("")}</div><button class="primary huge" id="keepCards">컬렉션에 보관하기</button>`;area.hidden=false;renderAll();
@@ -210,7 +213,7 @@
         const fresh=catalog.get(c.id);
         return officialWithProgress(fresh,c);
       });
-      state={...defaultState(),...d,version:6}; save(); renderAll(); toast("백업을 불러왔어요"); go("home");
+      state={...defaultState(),...d,version:7}; save(); renderAll(); toast("백업을 불러왔어요"); go("home");
     }catch{toast("올바른 백업 파일이 아니에요");}};
     r.readAsText(file);
   }
