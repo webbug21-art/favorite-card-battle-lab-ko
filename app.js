@@ -189,6 +189,30 @@
       `마지막 · ${rule.stat.toUpperCase()} 대결 ${Math.round(a)} : ${Math.round(b)}!`
     ]:[`${mine.name}이(가) ${mine.specialSkill1}을 사용했어요!`,`${foe.name}은(는) ${foe.specialSkill2}로 맞섰어요.`,`점수 ${Math.round(a)} : ${Math.round(b)} — 카드가 사라지거나 다치지는 않아요.`];
     $("#battleSetup").hidden=true;const ar=$("#battleArena");ar.hidden=false;ar.innerHTML=`<div class="battle-stage"><div class="versus"><div class="fighter"><div class="fighter-art" style="${artStyle(mine)}">${safeImage(mine.image)?"":mine.icon}</div><h3>${esc(mine.name)}</h3></div><div class="vs">VS</div><div class="fighter"><div class="fighter-art" style="${artStyle(foe)}">${safeImage(foe.image)?"":foe.icon}</div><h3>${esc(foe.name)}</h3></div></div><div class="battle-rule">✦ ${rule.name}</div><div class="battle-log">${rounds.map((x,i)=>`<div class="log-line" style="animation-delay:${i*.18}s">${esc(x)}</div>`).join("")}</div><div class="winner">${won?`🏆 ${esc(mine.name)} 승리!`:`✨ ${esc(foe.name)} 승리!`}</div><button class="primary huge" id="battleAgain">다시 대결하기 · +${won?10:4} XP</button></div>`;
+    if(finished){
+      const applyChampionGlow=()=>{
+        const champ=ar.querySelector(".winner-fighter");
+        const art=champ?.querySelector(".fighter-art");
+        if(!champ||!art)return;
+        champ.style.position="relative";
+        champ.style.zIndex="20";
+        champ.style.filter="drop-shadow(0 0 22px rgba(255,209,102,.9)) drop-shadow(0 0 34px rgba(154,124,255,.85))";
+        art.style.borderColor="#fff3a9";
+        art.style.boxShadow="0 0 0 5px rgba(255,246,168,.45), 0 0 34px rgba(255,209,102,.98), 0 0 86px rgba(154,124,255,.95), 0 18px 42px rgba(0,0,0,.9)";
+        art.style.filter="brightness(1.22) saturate(1.28)";
+        art.style.outline="3px solid rgba(255,255,255,.42)";
+        if(!champ.querySelector(".champion-badge")){
+          champ.insertAdjacentHTML("beforeend",`<div class="champion-badge" style="position:absolute;left:50%;top:-12px;z-index:30;transform:translateX(-50%);padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#fff4a6,#ffd166 45%,#a98cff);color:#141327;font-size:11px;font-weight:900;letter-spacing:.9px;box-shadow:0 0 18px rgba(255,209,102,.95),0 0 32px rgba(154,124,255,.75);white-space:nowrap;pointer-events:none;">✦ CHAMPION ✦</div>`);
+        }
+        if(art.animate&&!art.dataset.championAnimated){
+          art.dataset.championAnimated="1";
+          champ.animate([{transform:"translateY(0) scale(1)"},{transform:"translateY(-7px) scale(1.035)"},{transform:"translateY(0) scale(1)"}],{duration:1500,iterations:Infinity,easing:"ease-in-out"});
+          art.animate([{filter:"brightness(1.12) saturate(1.15)"},{filter:"brightness(1.36) saturate(1.38)"},{filter:"brightness(1.12) saturate(1.15)"}],{duration:1250,iterations:Infinity,easing:"ease-in-out"});
+        }
+      };
+      applyChampionGlow();
+      setTimeout(applyChampionGlow,980);
+    }
     requestAnimationFrame(()=>triggerBattleImpact(ar));
   }
   function statLabel(stat){
@@ -325,6 +349,41 @@
     $("#battleSetup").hidden=true;$("#battleArena").hidden=false;
     renderBattleStep();
   }
+  function applyChampionGlowToArena(ar){
+    const champ=ar.querySelector(".winner-fighter");
+    const art=champ?.querySelector(".fighter-art");
+    if(!champ||!art)return;
+    champ.style.position="relative";
+    champ.style.zIndex="20";
+    champ.style.filter="drop-shadow(0 0 22px rgba(255,209,102,.9)) drop-shadow(0 0 34px rgba(154,124,255,.85))";
+    art.style.borderColor="#fff3a9";
+    art.style.boxShadow="0 0 0 5px rgba(255,246,168,.45), 0 0 34px rgba(255,209,102,.98), 0 0 86px rgba(154,124,255,.95), 0 18px 42px rgba(0,0,0,.9)";
+    art.style.filter="brightness(1.22) saturate(1.28)";
+    art.style.outline="3px solid rgba(255,255,255,.42)";
+    if(!champ.querySelector(".champion-badge")){
+      champ.insertAdjacentHTML("beforeend",`<div class="champion-badge" style="position:absolute;left:50%;top:-12px;z-index:30;transform:translateX(-50%);padding:7px 11px;border-radius:999px;background:linear-gradient(135deg,#fff4a6,#ffd166 45%,#a98cff);color:#141327;font-size:11px;font-weight:900;letter-spacing:.9px;box-shadow:0 0 18px rgba(255,209,102,.95),0 0 32px rgba(154,124,255,.75);white-space:nowrap;pointer-events:none;">✦ CHAMPION ✦</div>`);
+    }
+    if(art.animate&&!art.dataset.championAnimated){
+      art.dataset.championAnimated="1";
+      champ.animate([{transform:"translateY(0) scale(1)"},{transform:"translateY(-7px) scale(1.035)"},{transform:"translateY(0) scale(1)"}],{duration:1500,iterations:Infinity,easing:"ease-in-out"});
+      art.animate([{filter:"brightness(1.12) saturate(1.15)"},{filter:"brightness(1.36) saturate(1.38)"},{filter:"brightness(1.12) saturate(1.15)"}],{duration:1250,iterations:Infinity,easing:"ease-in-out"});
+    }
+    const winner=ar.querySelector(".winner");
+    if(winner&&!ar.querySelector(".winner-spotlight")){
+      const panel=document.createElement("div");
+      panel.className="winner-spotlight";
+      panel.style.cssText="display:grid;grid-template-columns:92px 1fr;gap:14px;align-items:center;margin:18px 0 12px;padding:13px;border-radius:20px;background:radial-gradient(circle at 16% 50%,rgba(255,209,102,.36),transparent 38%),linear-gradient(135deg,rgba(255,209,102,.18),rgba(154,124,255,.2));border:1px solid rgba(255,243,169,.55);box-shadow:0 0 26px rgba(255,209,102,.28),0 0 42px rgba(154,124,255,.22);";
+      const mini=document.createElement("div");
+      mini.className="winner-spotlight-art";
+      mini.style.cssText="width:92px;aspect-ratio:4/5;border-radius:15px;background-size:cover;background-position:center;border:3px solid #fff3a9;box-shadow:0 0 24px rgba(255,209,102,.95),0 0 46px rgba(154,124,255,.8);animation:winnerFloat 1.4s ease-in-out infinite;";
+      mini.style.backgroundImage=art.style.backgroundImage;
+      const copy=document.createElement("div");
+      copy.innerHTML=`<span style="display:inline-block;margin-bottom:5px;padding:5px 9px;border-radius:999px;background:linear-gradient(135deg,#fff4a6,#ffd166 48%,#a98cff);color:#141327;font-size:10px;font-weight:900;letter-spacing:1px;box-shadow:0 0 18px rgba(255,209,102,.75);">✦ CHAMPION ✦</span><b style="display:block;color:#fff6b8;font-size:20px;text-shadow:0 0 16px #ffd166,0 0 28px #9a7cff;">승자 카드 빛나는 중!</b><small style="display:block;margin-top:4px;color:#dfe3ff;">황금 오라가 켜졌어요</small>`;
+      panel.append(mini,copy);
+      winner.before(panel);
+      setTimeout(()=>panel.scrollIntoView({block:"center",behavior:"smooth"}),80);
+    }
+  }
   function renderBattleStep(){
     const b=activeStepBattle;if(!b)return;
     const visible=b.rounds.slice(0,b.shown),score=stepCount(visible),finished=b.shown>=b.rounds.length;
@@ -338,6 +397,10 @@
     const foeWinClass=finished&&!b.won?" winner-fighter":"";
     const hidden=b.rounds.slice(b.shown).map((r,i)=>`<div class="round-card locked" style="animation-delay:${(visible.length+i)*.12}s"><b>${r.number}R · ???</b><p>${r.final?"마지막 필살기가 기다리고 있어요.":"아직 결과를 열지 않았어요."}</p><small>버튼을 누르면 공개됩니다</small></div>`).join("");
     ar.innerHTML=`<div class="battle-stage step-battle${finishedClass}"><div class="versus"><div class="fighter${mineWinClass}"><div class="fighter-art" style="${artStyle(b.mine)}">${safeImage(b.mine.image)?"":b.mine.icon}</div><h3>${esc(b.mine.name)}</h3></div><div class="vs">VS</div><div class="fighter${foeWinClass}"><div class="fighter-art" style="${artStyle(b.foe)}">${safeImage(b.foe.image)?"":b.foe.icon}</div><h3>${esc(b.foe.name)}</h3></div></div><div class="battle-rule">✦ ${b.bossMode?"보스전 · 3라운드":"베스트 오브 3"} · ${esc(b.rule.name)}</div><div class="round-score"><span class="${score.mine>score.foe?"active":""}">${score.mine}</span><b>${scoreLine}</b><span class="${score.foe>score.mine?"active":""}">${score.foe}</span></div><div class="round-timeline">${visible.map((r,i)=>`<div class="round-card ${stepRoundClass(r.winner)}" style="animation-delay:${i*.12}s"><b>${r.number}R · ${esc(r.title)}</b><p>${esc(r.lead)}</p><small>${esc(r.move)} · ${esc(b.mine.name)} ${r.a} : ${r.b} ${esc(b.foe.name)}</small></div>`).join("")}${hidden}</div>${finished?`<div class="winner">${verdict}</div><button class="primary huge" id="battleAgain">다시 대결하기 · +${b.xp} XP</button>`:`<div class="battle-suspense"><span>두근두근</span><b>${b.shown===1?"2라운드에서 흐름이 뒤집힐 수 있어요":"이제 진짜 마지막 한 방이에요"}</b></div><button class="primary huge pulse-next" id="nextRound">${nextLabel}</button>`}</div>`;
+    if(finished){
+      applyChampionGlowToArena(ar);
+      setTimeout(()=>applyChampionGlowToArena(ar),980);
+    }
     requestAnimationFrame(()=>triggerBattleImpact(ar));
   }
   function revealNextBattleRound(){
