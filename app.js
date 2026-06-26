@@ -381,10 +381,15 @@
       copy.innerHTML=`<span style="display:inline-block;margin-bottom:5px;padding:5px 9px;border-radius:999px;background:linear-gradient(135deg,#fff4a6,#ffd166 48%,#a98cff);color:#141327;font-size:10px;font-weight:900;letter-spacing:1px;box-shadow:0 0 18px rgba(255,209,102,.75);">✦ CHAMPION ✦</span><b style="display:block;color:#fff6b8;font-size:20px;text-shadow:0 0 16px #ffd166,0 0 28px #9a7cff;">승자 카드 빛나는 중!</b><small style="display:block;margin-top:4px;color:#dfe3ff;">황금 오라가 켜졌어요</small>`;
       panel.append(mini,copy);
       winner.before(panel);
-      setTimeout(()=>panel.scrollIntoView({block:"center",behavior:"smooth"}),80);
     }
   }
-  function renderBattleStep(){
+  function focusBattleCards(ar){
+    const target=ar.querySelector(".versus")||ar.querySelector(".battle-stage");
+    if(!target)return;
+    const top=Math.max(0,target.getBoundingClientRect().top+window.scrollY-84);
+    window.scrollTo({top,behavior:"smooth"});
+  }
+  function renderBattleStep(focusCards=false){
     const b=activeStepBattle;if(!b)return;
     const visible=b.rounds.slice(0,b.shown),score=stepCount(visible),finished=b.shown>=b.rounds.length;
     if(finished&&!b.awarded){gainXP(b.mine,b.xp);b.awarded=true;save();renderAll();}
@@ -401,13 +406,14 @@
       applyChampionGlowToArena(ar);
       setTimeout(()=>applyChampionGlowToArena(ar),980);
     }
-    requestAnimationFrame(()=>triggerBattleImpact(ar));
+    if(focusCards)focusBattleCards(ar);
+    requestAnimationFrame(()=>setTimeout(()=>triggerBattleImpact(ar),focusCards?240:0));
   }
   function revealNextBattleRound(){
     if(!activeStepBattle||activeStepBattle.shown>=activeStepBattle.rounds.length)return;
     const btn=$("#nextRound");if(btn){btn.disabled=true;btn.textContent="두근… 두근…";btn.classList.add("waiting");}
     if(navigator.vibrate)navigator.vibrate([12,28,12]);
-    setTimeout(()=>{if(!activeStepBattle)return;activeStepBattle.shown++;renderBattleStep();},520);
+    setTimeout(()=>{if(!activeStepBattle)return;activeStepBattle.shown++;renderBattleStep(true);},520);
   }
 
   document.addEventListener("click",e=>{
