@@ -282,13 +282,78 @@
     r.readAsText(file);
   }
 
+  let activeStepBattle=null;
+  function stepStatLabel(stat){
+    return {power:"파워",speed:"스피드",brain:"전략",shield:"방어"}[stat]||String(stat).toUpperCase();
+  }
+  function stepRoundValue(card, stat, rule, final=false){
+    const total=card.power+card.speed+card.brain+card.shield;
+    const typeBonus=(card.type1===rule.bonus||card.type2===rule.bonus)?(final?4.5:2.5):0;
+    const ruleBonus=rule.stat===stat?1.5:0;
+    if(final){
+      const ace=Math.max(card.power,card.speed,card.brain,card.shield);
+      return total*.68+ace*1.35+(card.level||1)*.55+typeBonus+Math.random()*4.2;
+    }
+    return card[stat]*2+total*.12+typeBonus+ruleBonus+Math.random()*2.8;
+  }
+  function makeStepRound(number,title,stat,mine,foe,rule,final=false){
+    const a=stepRoundValue(mine,stat,rule,final),b=stepRoundValue(foe,stat,rule,final);
+    const close=Math.abs(a-b)<1.1&&!final;
+    const winner=a>=b?"mine":"foe";
+    const lead=winner==="mine"?`${mine.name} 카드가 ${close?"아슬아슬하게 ":""}흐름을 잡았어요.`:`${foe.name} 카드가 ${close?"아슬아슬하게 ":""}반격했어요.`;
+    const move=final?`${mine.specialSkill1} vs ${foe.specialSkill1}`:`${stepStatLabel(stat)} 체크`;
+    return {number,title,stat,a:Math.round(a),b:Math.round(b),winner,lead,move,final};
+  }
+  function stepRoundClass(winner){return winner==="mine"?"mine-win":"foe-win";}
+  function stepCount(rounds){
+    return rounds.reduce((s,r)=>{s[r.winner==="mine"?"mine":"foe"]++;return s;},{mine:0,foe:0});
+  }
+  function battle(){
+    const mine=findCard($("#battleCard").value); if(!mine){toast("먼저 카드를 발견해 주세요");return;}
+    const bossMode=$("#battleMode").value==="boss";
+    let pool=[...CARD_DB,...BOSSES].filter(c=>c.name!==mine.name);
+    if(bossMode) pool=pool.filter(c=>["Mythic","Favorite Boss"].includes(c.rarity));
+    const foe={...pool[Math.floor(Math.random()*pool.length)]}, rule=RULES[Math.floor(Math.random()*RULES.length)];
+    const rounds=[
+      makeStepRound(1,"선공 싸움","speed",mine,foe,rule),
+      makeStepRound(2,`${rule.name} 필드`,rule.stat,mine,foe,rule)
+    ];
+    const firstTwo=stepCount(rounds);
+    if(bossMode||firstTwo.mine===firstTwo.foe)rounds.push(makeStepRound(3,"최종 필살기","power",mine,foe,rule,true));
+    const finalScore=stepCount(rounds), won=finalScore.mine>=finalScore.foe, xp=won?12:5;
+    activeStepBattle={mine,foe,rule,bossMode,rounds,shown:1,finalScore,won,xp,awarded:false};
+    $("#battleSetup").hidden=true;$("#battleArena").hidden=false;
+    renderBattleStep();
+  }
+  function renderBattleStep(){
+    const b=activeStepBattle;if(!b)return;
+    const visible=b.rounds.slice(0,b.shown),score=stepCount(visible),finished=b.shown>=b.rounds.length;
+    if(finished&&!b.awarded){gainXP(b.mine,b.xp);b.awarded=true;save();renderAll();}
+    const ar=$("#battleArena");
+    const nextLabel=b.shown===1?"심호흡하고 2라운드 열기":b.rounds[b.shown]?.final?"🔥 최종 필살기 열기":"다음 라운드 열기";
+    const scoreLine=`${esc(b.mine.name)} ${score.mine} : ${score.foe} ${esc(b.foe.name)}`;
+    const verdict=b.won?`🏆 ${esc(b.mine.name)} 최종 승리!`:`✨ ${esc(b.foe.name)} 최종 승리!`;
+    const finishedClass=finished?" battle-finished":"";
+    const mineWinClass=finished&&b.won?" winner-fighter":"";
+    const foeWinClass=finished&&!b.won?" winner-fighter":"";
+    const hidden=b.rounds.slice(b.shown).map((r,i)=>`<div class="round-card locked" style="animation-delay:${(visible.length+i)*.12}s"><b>${r.number}R · ???</b><p>${r.final?"마지막 필살기가 기다리고 있어요.":"아직 결과를 열지 않았어요."}</p><small>버튼을 누르면 공개됩니다</small></div>`).join("");
+    ar.innerHTML=`<div class="battle-stage step-battle${finishedClass}"><div class="versus"><div class="fighter${mineWinClass}"><div class="fighter-art" style="${artStyle(b.mine)}">${safeImage(b.mine.image)?"":b.mine.icon}</div><h3>${esc(b.mine.name)}</h3></div><div class="vs">VS</div><div class="fighter${foeWinClass}"><div class="fighter-art" style="${artStyle(b.foe)}">${safeImage(b.foe.image)?"":b.foe.icon}</div><h3>${esc(b.foe.name)}</h3></div></div><div class="battle-rule">✦ ${b.bossMode?"보스전 · 3라운드":"베스트 오브 3"} · ${esc(b.rule.name)}</div><div class="round-score"><span class="${score.mine>score.foe?"active":""}">${score.mine}</span><b>${scoreLine}</b><span class="${score.foe>score.mine?"active":""}">${score.foe}</span></div><div class="round-timeline">${visible.map((r,i)=>`<div class="round-card ${stepRoundClass(r.winner)}" style="animation-delay:${i*.12}s"><b>${r.number}R · ${esc(r.title)}</b><p>${esc(r.lead)}</p><small>${esc(r.move)} · ${esc(b.mine.name)} ${r.a} : ${r.b} ${esc(b.foe.name)}</small></div>`).join("")}${hidden}</div>${finished?`<div class="winner">${verdict}</div><button class="primary huge" id="battleAgain">다시 대결하기 · +${b.xp} XP</button>`:`<div class="battle-suspense"><span>두근두근</span><b>${b.shown===1?"2라운드에서 흐름이 뒤집힐 수 있어요":"이제 진짜 마지막 한 방이에요"}</b></div><button class="primary huge pulse-next" id="nextRound">${nextLabel}</button>`}</div>`;
+    requestAnimationFrame(()=>triggerBattleImpact(ar));
+  }
+  function revealNextBattleRound(){
+    if(!activeStepBattle||activeStepBattle.shown>=activeStepBattle.rounds.length)return;
+    const btn=$("#nextRound");if(btn){btn.disabled=true;btn.textContent="두근… 두근…";btn.classList.add("waiting");}
+    if(navigator.vibrate)navigator.vibrate([12,28,12]);
+    setTimeout(()=>{if(!activeStepBattle)return;activeStepBattle.shown++;renderBattleStep();},520);
+  }
+
   document.addEventListener("click",e=>{
     const goBtn=e.target.closest("[data-go]");if(goBtn){if(goBtn.dataset.go==="create")fillForm();go(goBtn.dataset.go);return;}
     const card=e.target.closest(".game-card");if(card&&!e.target.closest("[data-favorite]")){detail(card.dataset.id);return;}
     const fav=e.target.closest("[data-favorite]");if(fav){e.stopPropagation();const c=state.collection.find(x=>x.id===fav.dataset.favorite);if(c){c.isFavorite=!c.isFavorite;save();renderAll();if(currentScreen==="detail")detail(c.id);}return;}
     const pack=e.target.closest("[data-pack]");if(pack)openPack(pack.dataset.pack);
     if(e.target.id==="keepCards"){$("#revealArea").hidden=true;go("collection");}
-    if(e.target.id==="battleButton")battle(); if(e.target.id==="battleAgain"){$("#battleArena").hidden=true;$("#battleSetup").hidden=false;}
+    if(e.target.id==="battleButton")battle(); if(e.target.id==="nextRound")revealNextBattleRound(); if(e.target.id==="battleAgain"){activeStepBattle=null;$("#battleArena").hidden=true;$("#battleSetup").hidden=false;}
     if(e.target.id==="storyButton")storyBattle();
     const use=e.target.closest("[data-use-battle]");if(use){go("battle");$("#battleCard").value=use.dataset.useBattle;}
     const power=e.target.closest("[data-power]");if(power){const c=state.collection.find(x=>x.id===power.dataset.power);gainXP(c,5);save();renderAll();detail(c.id);toast("즐거운 연습! +5 XP");}
