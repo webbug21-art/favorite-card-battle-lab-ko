@@ -168,6 +168,15 @@
     if((card.weakness||"").toLowerCase().includes(rule.name.split(" ")[0].toLowerCase()))n-=3;
     return n+Math.random()*4;
   }
+  function triggerBattleImpact(ar){
+    const stage=ar.querySelector(".battle-stage");
+    if(!stage)return;
+    stage.classList.remove("impact-ready","impact-shake","impact-settled");
+    void stage.offsetWidth;
+    stage.classList.add("impact-ready","impact-shake");
+    if(navigator.vibrate)navigator.vibrate([18,32,22]);
+    setTimeout(()=>{stage.classList.remove("impact-shake");stage.classList.add("impact-settled");},920);
+  }
   function battle(){
     const mine=findCard($("#battleCard").value); if(!mine){toast("먼저 카드를 발견해 주세요");return;}
     let pool=[...CARD_DB,...BOSSES].filter(c=>c.name!==mine.name);
@@ -180,6 +189,7 @@
       `마지막 · ${rule.stat.toUpperCase()} 대결 ${Math.round(a)} : ${Math.round(b)}!`
     ]:[`${mine.name}이(가) ${mine.specialSkill1}을 사용했어요!`,`${foe.name}은(는) ${foe.specialSkill2}로 맞섰어요.`,`점수 ${Math.round(a)} : ${Math.round(b)} — 카드가 사라지거나 다치지는 않아요.`];
     $("#battleSetup").hidden=true;const ar=$("#battleArena");ar.hidden=false;ar.innerHTML=`<div class="battle-stage"><div class="versus"><div class="fighter"><div class="fighter-art" style="${artStyle(mine)}">${safeImage(mine.image)?"":mine.icon}</div><h3>${esc(mine.name)}</h3></div><div class="vs">VS</div><div class="fighter"><div class="fighter-art" style="${artStyle(foe)}">${safeImage(foe.image)?"":foe.icon}</div><h3>${esc(foe.name)}</h3></div></div><div class="battle-rule">✦ ${rule.name}</div><div class="battle-log">${rounds.map((x,i)=>`<div class="log-line" style="animation-delay:${i*.18}s">${esc(x)}</div>`).join("")}</div><div class="winner">${won?`🏆 ${esc(mine.name)} 승리!`:`✨ ${esc(foe.name)} 승리!`}</div><button class="primary huge" id="battleAgain">다시 대결하기 · +${won?10:4} XP</button></div>`;
+    requestAnimationFrame(()=>triggerBattleImpact(ar));
   }
   function storyBattle(){
     const a=findCard($("#storyCard1").value),b=findCard($("#storyCard2").value);if(!a||!b||a.id===b.id){toast("서로 다른 카드 2장을 골라 주세요");return;}
