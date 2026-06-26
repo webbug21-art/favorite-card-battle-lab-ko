@@ -191,6 +191,48 @@
     $("#battleSetup").hidden=true;const ar=$("#battleArena");ar.hidden=false;ar.innerHTML=`<div class="battle-stage"><div class="versus"><div class="fighter"><div class="fighter-art" style="${artStyle(mine)}">${safeImage(mine.image)?"":mine.icon}</div><h3>${esc(mine.name)}</h3></div><div class="vs">VS</div><div class="fighter"><div class="fighter-art" style="${artStyle(foe)}">${safeImage(foe.image)?"":foe.icon}</div><h3>${esc(foe.name)}</h3></div></div><div class="battle-rule">✦ ${rule.name}</div><div class="battle-log">${rounds.map((x,i)=>`<div class="log-line" style="animation-delay:${i*.18}s">${esc(x)}</div>`).join("")}</div><div class="winner">${won?`🏆 ${esc(mine.name)} 승리!`:`✨ ${esc(foe.name)} 승리!`}</div><button class="primary huge" id="battleAgain">다시 대결하기 · +${won?10:4} XP</button></div>`;
     requestAnimationFrame(()=>triggerBattleImpact(ar));
   }
+  function statLabel(stat){
+    return {power:"파워",speed:"스피드",brain:"전략",shield:"방어"}[stat]||String(stat).toUpperCase();
+  }
+  function roundValue(card, stat, rule, final=false){
+    const total=card.power+card.speed+card.brain+card.shield;
+    const typeBonus=(card.type1===rule.bonus||card.type2===rule.bonus)?(final?4:2.5):0;
+    const ruleBonus=rule.stat===stat?1.5:0;
+    if(final){
+      const ace=Math.max(card.power,card.speed,card.brain,card.shield);
+      return total*.68+ace*1.35+(card.level||1)*.55+typeBonus+Math.random()*4.2;
+    }
+    return card[stat]*2+total*.12+typeBonus+ruleBonus+Math.random()*2.8;
+  }
+  function makeRound(number,title,stat,mine,foe,rule,final=false){
+    const a=roundValue(mine,stat,rule,final),b=roundValue(foe,stat,rule,final);
+    const close=Math.abs(a-b)<1.1&&!final;
+    const winner=a>=b?"mine":"foe";
+    const lead=winner==="mine"?`${mine.name} 카드가 ${close?"아슬아슬하게 ":""}흐름을 잡았어요.`:`${foe.name} 카드가 ${close?"아슬아슬하게 ":""}반격에 성공했어요.`;
+    const move=final?`${mine.specialSkill1} vs ${foe.specialSkill1}`:`${statLabel(stat)} 체크`;
+    return {number,title,stat,a:Math.round(a),b:Math.round(b),winner,lead,move};
+  }
+  function roundClass(winner){return winner==="mine"?"mine-win":winner==="foe"?"foe-win":"draw";}
+  function battle(){
+    const mine=findCard($("#battleCard").value); if(!mine){toast("먼저 카드를 발견해 주세요");return;}
+    const bossMode=$("#battleMode").value==="boss";
+    let pool=[...CARD_DB,...BOSSES].filter(c=>c.name!==mine.name);
+    if(bossMode) pool=pool.filter(c=>["Mythic","Favorite Boss"].includes(c.rarity));
+    const foe={...pool[Math.floor(Math.random()*pool.length)]}, rule=RULES[Math.floor(Math.random()*RULES.length)];
+    const rounds=[];let mineWins=0,foeWins=0;
+    const addRound=(round)=>{rounds.push(round);if(round.winner==="mine")mineWins++;if(round.winner==="foe")foeWins++;};
+    addRound(makeRound(1,"선공 싸움","speed",mine,foe,rule));
+    addRound(makeRound(2,`${rule.name} 필드`,rule.stat,mine,foe,rule));
+    if(bossMode||mineWins<2&&foeWins<2)addRound(makeRound(3,"최종 필살기","power",mine,foe,rule,true));
+    const finalRound=rounds[rounds.length-1];
+    let won=mineWins>foeWins;
+    if(mineWins===foeWins)won=finalRound.winner!=="foe";
+    gainXP(mine,won?12:5);save();renderAll();
+    const verdict=won?`🏆 ${esc(mine.name)} 최종 승리!`:`✨ ${esc(foe.name)} 최종 승리!`;
+    const scoreLine=`${esc(mine.name)} ${mineWins} : ${foeWins} ${esc(foe.name)}`;
+    $("#battleSetup").hidden=true;const ar=$("#battleArena");ar.hidden=false;ar.innerHTML=`<div class="battle-stage"><div class="versus"><div class="fighter"><div class="fighter-art" style="${artStyle(mine)}">${safeImage(mine.image)?"":mine.icon}</div><h3>${esc(mine.name)}</h3></div><div class="vs">VS</div><div class="fighter"><div class="fighter-art" style="${artStyle(foe)}">${safeImage(foe.image)?"":foe.icon}</div><h3>${esc(foe.name)}</h3></div></div><div class="battle-rule">✦ ${bossMode?"보스전 · 3라운드":"베스트 오브 3"} · ${esc(rule.name)}</div><div class="round-score"><span class="${won?"active":""}">${mineWins}</span><b>${scoreLine}</b><span class="${won?"":"active"}">${foeWins}</span></div><div class="round-timeline">${rounds.map((r,i)=>`<div class="round-card ${roundClass(r.winner)}" style="animation-delay:${i*.18}s"><b>${r.number}R · ${esc(r.title)}</b><p>${esc(r.lead)}</p><small>${esc(r.move)} · ${esc(mine.name)} ${r.a} : ${r.b} ${esc(foe.name)}</small></div>`).join("")}</div><div class="winner">${verdict}</div><button class="primary huge" id="battleAgain">다시 대결하기 · +${won?12:5} XP</button></div>`;
+    rounds.forEach((_,i)=>setTimeout(()=>triggerBattleImpact(ar),i*620+60));
+  }
   function storyBattle(){
     const a=findCard($("#storyCard1").value),b=findCard($("#storyCard2").value);if(!a||!b||a.id===b.id){toast("서로 다른 카드 2장을 골라 주세요");return;}
     const places=["끝없이 움직이는 퍼즐 도서관","별빛이 흐르는 블록 도시","문이 백 개 달린 비밀 학교","구름 위의 글리치 정원"], problems=["출구의 색이 모두 사라졌어요","작은 길잡이 로봇이 집을 잃었어요","시간을 멈춘 수수께끼가 나타났어요","웃음을 먹는 회색 안개가 찾아왔어요"];
